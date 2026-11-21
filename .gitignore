@@ -14,6 +14,13 @@ dist/
 # workflow, not tracked in git at all.
 /src/sorter/_version.py
 
+# Release archive artifacts and local workspace files, not source files.
+/NOTES.md
+/PKG-INFO
+/main.py
+/Python Version.code-workspace
+/tatus --short
+
 # Runtime state. The data root normally lives outside the repo (see README);
 # `data/` only appears here for portable installs and legacy checkouts.
 # Root-anchored: `src/sorter/data/` is a tracked subpackage (persistence

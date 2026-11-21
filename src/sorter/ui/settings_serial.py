@@ -72,6 +72,30 @@ AIRDROP_FIELDS: tuple[tuple[str, str, int, int, int], ...] = (
     ("Post-drop delay (ms)", "airdroppostdelay", 0, 1500, 50),
 )
 
+# CS7.1/CS7.2 return PascalCase JSON keys, while the command names used by
+# the settings page are lowercase. Keep this translation at the UI boundary.
+BOARD_CONFIG_KEYS = {
+    "FeedMotorSpeed": "feedspeed",
+    "FeedCycleSteps": "feedsteps",
+    "SortMotorSpeed": "sortspeed",
+    "SortSteps": "sortsteps",
+    "NotificationDelay": "notificationdelay",
+    "SlotDropDelay": "slotdropdelay",
+    "AirDropEnabled": "airdropenabled",
+    "AirDropPostDelay": "airdroppostdelay",
+    "AirDropPreDelay": "airdroppredelay",
+    "AirDropSignalTime": "airdropdsignalduration",
+    "FeedHomingOffset": "feedhomingoffset",
+    "SortHomingOffset": "sorthomingoffset",
+    "AutoMotorStandbyTimeout": "automotorstandbytimeout",
+    "FeedMotorCurrent": "feedmotorcurrent",
+    "SortMotorCurrent": "sortmotorcurrent",
+    "CaseFanLevel": "fan",
+    "CameraLEDLevel": "cameraledlevel",
+    "DebounceTimeout": "debounceTimeout",
+    "DebouncePauseTime": "debounceTime",
+}
+
 
 class SerialSection(QWidget):
     """Connection + board init settings + sort-arm test + airdrop. State on ``self``."""
@@ -430,8 +454,15 @@ class SerialSection(QWidget):
             win.set_status("Board returned no config.")
             return
         applied = 0
-        for key, value in payload.items():
-            if key in self._init_widgets:
+        for raw_key, value in payload.items():
+            key = BOARD_CONFIG_KEYS.get(raw_key, raw_key)
+            if key == "airdropenabled":
+                try:
+                    self.airdrop_enabled_check.setChecked(bool(int(value)))
+                    applied += 1
+                except (TypeError, ValueError):
+                    pass
+            elif key in self._init_widgets:
                 try:
                     self._init_widgets[key].setValue(int(value))
                     applied += 1

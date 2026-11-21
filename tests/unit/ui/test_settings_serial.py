@@ -309,6 +309,36 @@ def test_fetch_board_config_applies_matching_keys(window) -> None:
     assert "Loaded 2 value(s)" in window.statusBar().currentMessage()
 
 
+def test_apply_board_config_accepts_pascal_case_keys(window) -> None:
+    section = build_serial_section(window)
+
+    section._apply_board_config({
+        "FeedMotorSpeed": 60,
+        "FeedCycleSteps": 75,
+        "SortMotorSpeed": 94,
+        "SortSteps": 20,
+        "NotificationDelay": 120,
+        "SlotDropDelay": 550,
+        "AirDropEnabled": 1,
+        "AirDropPreDelay": 99,
+        "CameraLEDLevel": 200,
+        "DebounceTimeout": 300,
+        "DebouncePauseTime": 500,
+    })
+
+    assert section._init_widgets["feedspeed"].value() == 60
+    assert section._init_widgets["feedsteps"].value() == 75
+    assert section._init_widgets["sortspeed"].value() == 94
+    assert section.sort_steps_spin.value() == 20
+    assert section._init_widgets["notificationdelay"].value() == 120
+    assert section._init_widgets["slotdropdelay"].value() == 550
+    assert section.airdrop_enabled_check.isChecked()
+    assert section._init_widgets["airdroppredelay"].value() == 99
+    assert section._init_widgets["cameraledlevel"].value() == 200
+    assert section._init_widgets["debounceTimeout"].value() == 300
+    assert section._init_widgets["debounceTime"].value() == 500
+
+
 def test_fetch_board_config_persists_the_applied_values(window, config) -> None:
     section = build_serial_section(window)
     _connect_emulated(window, section)
